@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alliance by NEST — MVP Demo</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0d0f14;color:#e8eaf0;font-size:14px;min-height:100vh}
+:root{--bg:#0d0f14;--bg2:#14171f;--bg3:#1c2030;--bg4:#242840;--text:#e8eaf0;--text2:#8b90a8;--text3:#555a72;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);--accent:#6c63ff;--accent2:#8b84ff;--accent-bg:rgba(108,99,255,0.12);--green:#22c880;--green-bg:rgba(34,200,128,0.1);--red:#f05050;--red-bg:rgba(240,80,80,0.1);--amber:#f0a030;--amber-bg:rgba(240,160,48,0.1);--r:8px;--r2:12px}
+.topbar{height:52px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:16px;position:sticky;top:0;z-index:10}
+.brand{font-size:16px;font-weight:600;letter-spacing:-.02em}
+.brand span{color:var(--accent2)}
+.brand sub{font-size:10px;color:var(--text3);font-weight:400;letter-spacing:.04em;margin-left:4px}
+.tabs{display:flex;gap:2px;flex:1;overflow-x:auto}
+.tab{padding:6px 12px;border-radius:var(--r);font-size:13px;cursor:pointer;color:var(--text2);border:none;background:transparent;white-space:nowrap;font-family:inherit}
+.tab.active{background:var(--accent-bg);color:var(--accent2);font-weight:500}
+.role-switcher{display:flex;gap:6px;align-items:center}
+.role-btn{font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-family:inherit}
+.role-btn.active{border-color:var(--accent);background:var(--accent-bg);color:var(--accent2)}
+.screen{padding:20px;display:none;max-width:900px;margin:0 auto}
+.screen.active{display:block}
+.hero{text-align:center;padding:48px 20px 32px}
+.hero-badge{display:inline-block;font-size:11px;padding:4px 12px;border-radius:20px;background:var(--accent-bg);color:var(--accent2);border:1px solid rgba(108,99,255,0.25);margin-bottom:16px;letter-spacing:.06em}
+.hero h1{font-size:36px;font-weight:700;letter-spacing:-.03em;margin-bottom:12px;line-height:1.1}
+.hero h1 span{color:var(--accent2)}
+.hero p{font-size:15px;color:var(--text2);max-width:440px;margin:0 auto 28px;line-height:1.6}
+.hero-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.btn{padding:10px 20px;border-radius:var(--r);font-size:14px;cursor:pointer;font-family:inherit;font-weight:500;border:none}
+.btn-primary{background:var(--accent);color:white}
+.btn-primary:hover{background:var(--accent2)}
+.btn-outline{background:transparent;border:1px solid var(--border2);color:var(--text)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent2)}
+.btn-sm{padding:7px 14px;font-size:13px}
+.btn-danger{background:var(--red-bg);color:var(--red);border:1px solid rgba(240,80,80,0.2)}
+.btn-success{background:var(--green-bg);color:var(--green);border:1px solid rgba(34,200,128,0.2)}
+.section-title{font-size:13px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px}
+.group-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.group-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:16px;cursor:pointer;transition:border-color .15s}
+.group-card:hover{border-color:var(--border2)}
+.group-name{font-size:15px;font-weight:600;margin-bottom:4px}
+.group-desc{font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
+.tag{font-size:11px;padding:2px 8px;border-radius:20px;background:var(--bg3);color:var(--text2);border:1px solid var(--border)}
+.tag.accent{background:var(--accent-bg);color:var(--accent2);border-color:rgba(108,99,255,0.2)}
+.group-meta{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text3)}
+.form-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:24px;max-width:560px;margin:0 auto}
+.form-title{font-size:18px;font-weight:600;margin-bottom:4px}
+.form-sub{font-size:13px;color:var(--text2);margin-bottom:20px}
+.field{margin-bottom:16px}
+.field label{font-size:12px;color:var(--text2);display:block;margin-bottom:6px;font-weight:500}
+.field input,.field textarea,.field select{width:100%;padding:9px 12px;border-radius:var(--r);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:13px;font-family:inherit}
+.field textarea{resize:vertical;min-height:72px}
+.multi-select{display:flex;flex-wrap:wrap;gap:6px}
+.ms-opt{padding:5px 12px;border-radius:20px;border:1px solid var(--border2);font-size:12px;cursor:pointer;color:var(--text2);background:var(--bg3)}
+.ms-opt.sel{border-color:var(--accent);background:var(--accent-bg);color:var(--accent2)}
+.avatar-placeholder{width:72px;height:72px;border-radius:50%;background:var(--bg4);border:2px dashed var(--border2);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;margin-bottom:12px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.profile-header{display:flex;gap:16px;align-items:flex-start;margin-bottom:20px}
+.avatar{width:64px;height:64px;border-radius:50%;background:var(--accent-bg);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.profile-name{font-size:20px;font-weight:700;margin-bottom:2px}
+.profile-sub{font-size:13px;color:var(--text2);margin-bottom:8px}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:16px}
+.stat-val{font-size:28px;font-weight:700;margin-bottom:2px}
+.stat-label{font-size:12px;color:var(--text2)}
+.request-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.request-info{display:flex;align-items:center;gap:10px}
+.mini-avatar{width:36px;height:36px;border-radius:50%;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.request-actions{display:flex;gap:6px}
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500}
+.badge-pending{background:var(--amber-bg);color:var(--amber);border:1px solid rgba(240,160,48,0.2)}
+.badge-approved{background:var(--green-bg);color:var(--green);border:1px solid rgba(34,200,128,0.2)}
+.badge-rejected{background:var(--red-bg);color:var(--red);border:1px solid rgba(240,80,80,0.2)}
+.badge-member{background:var(--accent-bg);color:var(--accent2);border:1px solid rgba(108,99,255,0.2)}
+.member-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.member-row:last-child{border-bottom:none}
+.detail-header{display:flex;gap:16px;align-items:flex-start;margin-bottom:20px}
+.group-icon{width:56px;height:56px;border-radius:var(--r2);background:var(--accent-bg);border:1px solid rgba(108,99,255,0.25);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.arch-panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:20px;margin-top:20px}
+.arch-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.arch-item{background:var(--bg3);border-radius:var(--r);padding:12px;border:1px solid var(--border)}
+.arch-item h4{font-size:12px;font-weight:600;color:var(--accent2);margin-bottom:4px}
+.arch-item p{font-size:11px;color:var(--text2);line-height:1.5}
+.empty{text-align:center;padding:40px 20px;color:var(--text2)}
+.empty-icon{font-size:32px;margin-bottom:10px}
+.empty h3{font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px}
+.empty p{font-size:13px}
+.filter-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.filter-chip{padding:5px 12px;border-radius:20px;border:1px solid var(--border2);font-size:12px;cursor:pointer;color:var(--text2);background:transparent;font-family:inherit}
+.filter-chip.active{border-color:var(--accent);background:var(--accent-bg);color:var(--accent2)}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);padding:12px 16px;font-size:13px;z-index:100;opacity:0;transition:opacity .3s;pointer-events:none;max-width:260px}
+.toast.show{opacity:1}
+.toast.success{border-color:rgba(34,200,128,0.3);color:var(--green)}
+.spam-note{background:var(--amber-bg);border:1px solid rgba(240,160,48,0.2);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--amber);margin-bottom:16px}
+input:focus,textarea:focus,select:focus{outline:2px solid rgba(108,99,255,0.4);border-color:var(--accent)}
+@media(max-width:640px){.arch-row{grid-template-columns:1fr}.field-row{grid-template-columns:1fr}.dash-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="toast" class="toast"></div>
+<div class="topbar">
+  <div class="brand">Alliance<sub>by NEST</sub></div>
+  <div class="tabs">
+    <button class="tab active" onclick="go('home',this)">Home</button>
+    <button class="tab" onclick="go('profile',this)">Create profile</button>
+    <button class="tab" onclick="go('groups',this)">Browse groups</button>
+    <button class="tab" onclick="go('detail',this)">Group detail</button>
+    <button class="tab" onclick="go('org',this)">Organizer dashboard</button>
+    <button class="tab" onclick="go('arch',this)">Architecture</button>
+  </div>
+  <div class="role-switcher">
+    <button class="role-btn" onclick="setRole('guest',this)">Guest</button>
+    <button class="role-btn active" onclick="setRole('player',this)">Player</button>
+    <button class="role-btn" onclick="setRole('organizer',this)">Organizer</button>
+  </div>
+</div>
+
+<!-- HOME -->
+<div class="screen active" id="screen-home">
+  <div class="hero">
+    <div class="hero-badge">ALLIANCE BY NEST</div>
+    <h1>Find your <span>squad.</span><br>Join your community.</h1>
+    <p>A lightweight community layer for esports players and organizers. Simple by design.</p>
+    <div class="hero-btns">
+      <button class="btn btn-primary" onclick="go('profile',document.querySelectorAll('.tab')[1])">Create profile</button>
+      <button class="btn btn-outline" onclick="go('groups',document.querySelectorAll('.tab')[2])">Browse groups</button>
+    </div>
+  </div>
+  <div style="padding:0 0 32px">
+    <div class="section-title">Featured groups</div>
+    <div class="group-grid" id="featuredGroups"></div>
+  </div>
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:20px;display:flex;gap:32px;flex-wrap:wrap">
+    <div style="flex:1;min-width:180px">
+      <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">What Alliance is</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.8">✓ Create or join a group<br>✓ Find players to play with<br>✓ Lightweight community identity</div>
+    </div>
+    <div style="flex:1;min-width:180px">
+      <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">What Alliance is NOT (v1)</div>
+      <div style="font-size:13px;color:var(--text3);line-height:1.8">✗ Tournament platform<br>✗ Messaging system<br>✗ Stats or scheduling engine</div>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<div class="screen" id="screen-profile">
+  <div class="form-card" id="profileForm">
+    <div class="form-title">Create your player profile</div>
+    <div class="form-sub">Tell your community who you are and how you play.</div>
+    <div class="spam-note">⚠ Email verification required before your profile goes live. This keeps fake accounts out.</div>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+      <div class="avatar-placeholder" onclick="toast('Avatar upload — connected to file storage in production')">📷</div>
+      <div style="font-size:12px;color:var(--text2)">Click to upload avatar<br><span style="color:var(--text3)">JPG or PNG, max 2MB</span></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Display name *</label><input type="text" id="f-name" placeholder="Your in-game name"></div>
+      <div class="field"><label>Region / timezone *</label><select id="f-region"><option value="">Select region</option><option>NA East</option><option>NA West</option><option>EU West</option><option>EU East</option><option>APAC</option><option>LATAM</option></select></div>
+    </div>
+    <div class="field"><label>Games played *</label>
+      <div class="multi-select" id="games-select">
+        <span class="ms-opt" onclick="toggle(this)">Valorant</span>
+        <span class="ms-opt" onclick="toggle(this)">League of Legends</span>
+        <span class="ms-opt" onclick="toggle(this)">CS2</span>
+        <span class="ms-opt" onclick="toggle(this)">Fortnite</span>
+        <span class="ms-opt" onclick="toggle(this)">Rocket League</span>
+        <span class="ms-opt" onclick="toggle(this)">Apex Legends</span>
+        <span class="ms-opt" onclick="toggle(this)">Overwatch 2</span>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Platform *</label>
+        <div class="multi-select"><span class="ms-opt" onclick="toggle(this)">PC</span><span class="ms-opt" onclick="toggle(this)">Console</span><span class="ms-opt" onclick="toggle(this)">Mobile</span></div>
+      </div>
+      <div class="field"><label>Playstyle *</label>
+        <div class="multi-select"><span class="ms-opt" onclick="toggle(this)">Casual</span><span class="ms-opt" onclick="toggle(this)">Competitive</span><span class="ms-opt" onclick="toggle(this)">Mixed</span></div>
+      </div>
+    </div>
+    <div class="field"><label>Short bio *</label><textarea id="f-bio" placeholder="What you play, when you play, what kind of group you're looking for..." maxlength="400"></textarea><div style="font-size:11px;color:var(--text3);margin-top:4px">Max 400 characters</div></div>
+    <div class="field"><label>Roles &amp; interests (optional)</label>
+      <div class="multi-select"><span class="ms-opt" onclick="toggle(this)">Shot Caller</span><span class="ms-opt" onclick="toggle(this)">Team Captain</span><span class="ms-opt" onclick="toggle(this)">Tournament Admin</span><span class="ms-opt" onclick="toggle(this)">Casual Player</span><span class="ms-opt" onclick="toggle(this)">Content / Streaming</span><span class="ms-opt" onclick="toggle(this)">Coach / Mentor</span></div>
+    </div>
+    <div class="field"><label>Community / organizing experience (optional)</label><textarea placeholder="Any organizer or admin roles, events you've been part of..." maxlength="300" style="min-height:56px"></textarea></div>
+    <button class="btn btn-primary" onclick="submitProfile()" style="width:100%">Create profile</button>
+  </div>
+  <div id="profileView" style="display:none;max-width:560px;margin:0 auto">
+    <div class="form-card">
+      <div class="profile-header">
+        <div class="avatar">🎮</div>
+        <div>
+          <div class="profile-name" id="pv-name">PlayerOne</div>
+          <div class="profile-sub" id="pv-region">NA East · PC · Competitive</div>
+          <div class="tags" id="pv-games"></div>
+        </div>
+      </div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:16px" id="pv-bio"></div>
+      <div class="tags" id="pv-roles"></div>
+      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);font-size:12px;color:var(--text3)">Member since March 2026 · Profile visible to logged-in users</div>
+    </div>
+    <div style="text-align:center;margin-top:16px">
+      <button class="btn btn-outline" onclick="go('groups',document.querySelectorAll('.tab')[2])">Browse groups to join</button>
+    </div>
+  </div>
+</div>
+
+<!-- GROUPS -->
+<div class="screen" id="screen-groups">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <div style="font-size:18px;font-weight:700">Browse groups</div>
+    <input type="text" placeholder="Search groups..." style="width:200px;padding:7px 12px;border-radius:var(--r);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:13px">
+  </div>
+  <div class="filter-row">
+    <button class="filter-chip active" onclick="filterGroups('all',this)">All</button>
+    <button class="filter-chip" onclick="filterGroups('Valorant',this)">Valorant</button>
+    <button class="filter-chip" onclick="filterGroups('CS2',this)">CS2</button>
+    <button class="filter-chip" onclick="filterGroups('Rocket League',this)">Rocket League</button>
+    <button class="filter-chip" onclick="filterGroups('NA',this)">NA</button>
+    <button class="filter-chip" onclick="filterGroups('EU',this)">EU</button>
+    <button class="filter-chip" onclick="filterGroups('Competitive',this)">Competitive</button>
+    <button class="filter-chip" onclick="filterGroups('Casual',this)">Casual</button>
+  </div>
+  <div class="group-grid" id="allGroups"></div>
+</div>
+
+<!-- GROUP DETAIL -->
+<div class="screen" id="screen-detail">
+  <div style="margin-bottom:12px"><button class="btn btn-outline btn-sm" onclick="go('groups',document.querySelectorAll('.tab')[2])">← Back to groups</button></div>
+  <div class="detail-header">
+    <div class="group-icon">🎯</div>
+    <div style="flex:1">
+      <div style="font-size:20px;font-weight:700;margin-bottom:4px" id="det-name">Alpha Squad</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:8px" id="det-desc"></div>
+      <div class="tags" id="det-tags"></div>
+    </div>
+    <div id="det-action"></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div class="form-card" style="padding:16px;margin:0">
+      <div class="section-title">Members</div>
+      <div id="det-members"></div>
+    </div>
+    <div class="form-card" style="padding:16px;margin:0">
+      <div class="section-title">About this group</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.7" id="det-about"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ORGANIZER -->
+<div class="screen" id="screen-org">
+  <div style="font-size:18px;font-weight:700;margin-bottom:16px">Organizer dashboard</div>
+  <div class="dash-grid">
+    <div class="stat"><div class="stat-val" id="org-groups-count">2</div><div class="stat-label">Your groups</div></div>
+    <div class="stat"><div class="stat-val" id="org-requests-count">4</div><div class="stat-label">Pending requests</div></div>
+  </div>
+  <div style="margin-bottom:20px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div class="section-title" style="margin-bottom:0">Your groups</div>
+      <button class="btn btn-primary btn-sm" onclick="showCreateGroup()">+ Create group</button>
+    </div>
+    <div id="orgGroupsList"></div>
+  </div>
+  <div id="createGroupForm" style="display:none;margin-bottom:20px">
+    <div class="form-card" style="max-width:100%">
+      <div style="font-size:15px;font-weight:600;margin-bottom:14px">New group</div>
+      <div class="field"><label>Group name *</label><input type="text" id="cg-name" placeholder="e.g. Alpha Squad"></div>
+      <div class="field"><label>Short description *</label><textarea id="cg-desc" placeholder="What's this group about?" style="min-height:60px"></textarea></div>
+      <div class="field-row">
+        <div class="field"><label>Game *</label><select id="cg-game"><option>Valorant</option><option>CS2</option><option>Rocket League</option><option>League of Legends</option><option>Apex Legends</option></select></div>
+        <div class="field"><label>Region *</label><select id="cg-region"><option>NA</option><option>EU</option><option>APAC</option><option>LATAM</option></select></div>
+      </div>
+      <div class="field"><label>Level</label>
+        <div class="multi-select"><span class="ms-opt" onclick="toggle(this)">Casual</span><span class="ms-opt" onclick="toggle(this)">Competitive</span><span class="ms-opt" onclick="toggle(this)">Semi-pro</span></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button class="btn btn-primary btn-sm" onclick="createGroup()">Create group</button>
+        <button class="btn btn-outline btn-sm" onclick="document.getElementById('createGroupForm').style.display='none'">Cancel</button>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="section-title">Pending join requests</div>
+    <div class="spam-note">⚠ Rate limiting active — users can send max 3 join requests per hour. Flagged accounts are held for manual review.</div>
+    <div id="requestsList"></div>
+  </div>
+</div>
+
+<!-- ARCHITECTURE -->
+<div class="screen" id="screen-arch">
+  <div style="font-size:18px;font-weight:700;margin-bottom:4px">Architecture overview</div>
+  <div style="font-size:13px;color:var(--text2);margin-bottom:20px">How Alliance v1 is structured and why — built to stay simple, designed to scale.</div>
+  <div class="arch-panel">
+    <div class="section-title">Stack</div>
+    <div class="arch-row">
+      <div class="arch-item"><h4>Frontend</h4><p>Next.js / React — fast iteration, clean component model, easy hosting on Vercel or Netlify</p></div>
+      <div class="arch-item"><h4>Backend</h4><p>Node.js API — stateless routes, simple auth middleware, easy to scale horizontally</p></div>
+      <div class="arch-item"><h4>Database</h4><p>PostgreSQL — relational model for users, profiles, groups, memberships, requests, and tags</p></div>
+    </div>
+  </div>
+  <div class="arch-panel">
+    <div class="section-title">Data model</div>
+    <div class="arch-row">
+      <div class="arch-item"><h4>users</h4><p>id, email, role, verified, created_at</p></div>
+      <div class="arch-item"><h4>player_profiles</h4><p>id, user_id, display_name, avatar_url, games, platforms, region, playstyle, bio, roles_interests</p></div>
+      <div class="arch-item"><h4>groups</h4><p>id, name, description, game, region, level, organizer_user_id, created_at</p></div>
+      <div class="arch-item"><h4>group_memberships</h4><p>id, group_id, user_id, status (member/left), joined_at</p></div>
+      <div class="arch-item"><h4>join_requests</h4><p>id, group_id, user_id, status (pending/approved/rejected), created_at, reviewed_at</p></div>
+      <div class="arch-item"><h4>group_tags</h4><p>id, group_id, tag_type, tag_value</p></div>
+    </div>
+  </div>
+  <div class="arch-panel">
+    <div class="section-title">What is intentionally excluded from v1</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">
+      <span class="tag">Messaging</span><span class="tag">Scheduling</span><span class="tag">Tournament brackets</span><span class="tag">Stats</span><span class="tag">Payments</span><span class="tag">Voice/chat</span><span class="tag">Advanced roles</span><span class="tag">Automations</span><span class="tag">Integrations</span>
+    </div>
+    <div style="font-size:12px;color:var(--text3);margin-top:10px">These are added only when usage proves the need. No speculative building.</div>
+  </div>
+  <div class="arch-panel">
+    <div class="section-title">Scaling path</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.8">
+      → Stateless API routes allow horizontal scaling from day one<br>
+      → Indexed relational tables handle read-heavy group browse and profile views<br>
+      → Asset storage separated from relational data (S3 or R2 for avatars)<br>
+      → NEST account unification — OAuth connection point ready in users table<br>
+      → Caching layer (Redis) added on group directory when traffic warrants
+    </div>
+  </div>
+</div>
+
+<script>
+var role='player';
+var joinStates={};
+var groups=[
+  {id:1,name:'Alpha Squad',desc:'Competitive Valorant team looking for serious players. We scrim 3x a week.',game:'Valorant',region:'NA',level:'Competitive',members:12,organizer:'NightOwl'},
+  {id:2,name:'Casual Rockets',desc:'Chill Rocket League group. No rank requirements, just good vibes.',game:'Rocket League',region:'EU',level:'Casual',members:8,organizer:'RocketRaj'},
+  {id:3,name:'CS2 Grinders',desc:'Daily practice group for serious CS2 players. FACEIT level 8+.',game:'CS2',region:'NA',level:'Competitive',members:21,organizer:'FrostByte'},
+  {id:4,name:'Weekend Warriors',desc:'Casual gaming for adults with day jobs. Weekends only, all games welcome.',game:'Various',region:'NA',level:'Casual',members:34,organizer:'DadGamer99'},
+  {id:5,name:'EU Valorant Academy',desc:'For newer Valorant players wanting to improve in a supportive environment.',game:'Valorant',region:'EU',level:'Casual',members:15,organizer:'CoachKlaus'},
+  {id:6,name:'APAC Apex Crew',desc:'Finding players for ranked Apex across APAC servers.',game:'Apex Legends',region:'APAC',level:'Competitive',members:9,organizer:'PhoenixAU'},
+];
+var requests=[
+  {id:1,group:'Alpha Squad',user:'ShadowPlayer',games:'Valorant',playstyle:'Competitive',status:'pending'},
+  {id:2,group:'Alpha Squad',user:'NeonBlade',games:'Valorant',playstyle:'Competitive',status:'pending'},
+  {id:3,group:'Casual Rockets',user:'QuickFlip',games:'Rocket League',playstyle:'Casual',status:'pending'},
+  {id:4,group:'CS2 Grinders',user:'AimGod42',games:'CS2',playstyle:'Competitive',status:'pending'},
+];
+function go(id,btn){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(id==='home')renderFeatured();
+  if(id==='groups')renderGroups('all');
+  if(id==='detail')renderDetail(groups[0]);
+  if(id==='org')renderOrg();
+}
+function setRole(r,btn){role=r;document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');toast('Role: '+r.charAt(0).toUpperCase()+r.slice(1));}
+function toggle(el){el.classList.toggle('sel');}
+function groupCard(g){
+  var state=joinStates[g.id];
+  var btn='';
+  if(role==='guest')btn=`<button class="btn btn-outline btn-sm" onclick="toast('Sign in to join groups')">Sign in</button>`;
+  else if(role==='organizer')btn=`<span style="font-size:11px;color:var(--text3)">Organizer view</span>`;
+  else if(state==='pending')btn=`<span class="badge badge-pending">Pending</span>`;
+  else if(state==='member')btn=`<span class="badge badge-member">Member ✓</span>`;
+  else btn=`<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();requestJoin(${g.id},this)">Request to join</button>`;
+  return`<div class="group-card" onclick="openDetail(${g.id})"><div class="group-name">${g.name}</div><div class="group-desc">${g.desc}</div><div class="tags"><span class="tag accent">${g.game}</span><span class="tag">${g.region}</span><span class="tag">${g.level}</span></div><div class="group-meta"><span>${g.members} members</span>${btn}</div></div>`;
+}
+function renderFeatured(){document.getElementById('featuredGroups').innerHTML=groups.slice(0,3).map(g=>groupCard(g)).join('');}
+function renderGroups(filter){var el=document.getElementById('allGroups');var f=filter==='all'?groups:groups.filter(g=>g.game===filter||g.region===filter||g.level===filter);el.innerHTML=f.length?f.map(g=>groupCard(g)).join(''):`<div class="empty"><div class="empty-icon">🔍</div><h3>No groups found</h3><p>Try a different filter</p></div>`;}
+function filterGroups(f,btn){document.querySelectorAll('.filter-chip').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderGroups(f);}
+function openDetail(id){renderDetail(groups.find(x=>x.id===id)||groups[0]);go('detail',document.querySelectorAll('.tab')[3]);}
+function renderDetail(g){
+  document.getElementById('det-name').textContent=g.name;
+  document.getElementById('det-desc').textContent=g.desc;
+  document.getElementById('det-tags').innerHTML=`<span class="tag accent">${g.game}</span><span class="tag">${g.region}</span><span class="tag">${g.level}</span>`;
+  document.getElementById('det-about').innerHTML=`Organizer: <strong>${g.organizer}</strong><br><br>${g.desc}<br><br>This group has ${g.members} members. Join requests are reviewed by the organizer.`;
+  var members=['NightOwl (Organizer)','SilentSniper','VelvetAim','CrypticFox','ZenithPro'];
+  document.getElementById('det-members').innerHTML=members.map(m=>`<div class="member-row"><div class="mini-avatar">👤</div><div style="font-size:13px;font-weight:500">${m}</div></div>`).join('');
+  var state=joinStates[g.id];var act='';
+  if(role==='guest')act=`<button class="btn btn-outline btn-sm" onclick="toast('Sign in to join groups')">Sign in to join</button>`;
+  else if(role==='organizer')act=`<span class="badge badge-member">You own this</span>`;
+  else if(state==='pending')act=`<span class="badge badge-pending">Request pending</span>`;
+  else if(state==='member')act=`<button class="btn btn-danger btn-sm" onclick="leaveGroup(${g.id})">Leave group</button>`;
+  else act=`<button class="btn btn-primary" onclick="requestJoin(${g.id},this)">Request to join</button>`;
+  document.getElementById('det-action').innerHTML=act;
+}
+function requestJoin(id){if(role==='guest'){toast('Sign in to join groups');return;}joinStates[id]='pending';toast('Join request sent!');renderGroups('all');renderFeatured();var req={id:requests.length+1,group:groups.find(g=>g.id===id).name,user:'You',games:'Valorant',playstyle:'Competitive',status:'pending'};requests.push(req);document.getElementById('org-requests-count').textContent=requests.filter(r=>r.status==='pending').length;}
+function leaveGroup(id){joinStates[id]=null;toast('You left the group.');renderGroups('all');renderFeatured();renderDetail(groups.find(g=>g.id===id));}
+function submitProfile(){var name=document.getElementById('f-name').value||'PlayerOne';var region=document.getElementById('f-region').value||'NA East';var bio=document.getElementById('f-bio').value||'Ready to find my squad.';var games=[...document.querySelectorAll('#games-select .sel')].map(e=>e.textContent);document.getElementById('pv-name').textContent=name;document.getElementById('pv-region').textContent=region+' · PC · Competitive';document.getElementById('pv-bio').textContent=bio;document.getElementById('pv-games').innerHTML=games.map(g=>`<span class="tag accent">${g}</span>`).join('');document.getElementById('pv-roles').innerHTML='<span class="tag">Casual Player</span><span class="tag">Shot Caller</span>';document.getElementById('profileForm').style.display='none';document.getElementById('profileView').style.display='block';toast('Profile created!','success');}
+function renderOrg(){document.getElementById('orgGroupsList').innerHTML=groups.slice(0,2).map(g=>`<div class="request-card"><div><div style="font-size:14px;font-weight:600">${g.name}</div><div style="font-size:12px;color:var(--text2)">${g.game} · ${g.region} · ${g.members} members</div></div><button class="btn btn-outline btn-sm" onclick="openDetail(${g.id})">View group</button></div>`).join('');renderRequests();}
+function renderRequests(){var pending=requests.filter(r=>r.status==='pending');document.getElementById('org-requests-count').textContent=pending.length;document.getElementById('requestsList').innerHTML=pending.length?pending.map(r=>`<div class="request-card"><div class="request-info"><div class="mini-avatar">👤</div><div><div style="font-size:13px;font-weight:500">${r.user}</div><div style="font-size:11px;color:var(--text2)">${r.games} · ${r.playstyle} · ${r.group}</div></div></div><div class="request-actions"><button class="btn btn-success btn-sm" onclick="handleRequest(${r.id},'approved')">Approve</button><button class="btn btn-danger btn-sm" onclick="handleRequest(${r.id},'rejected')">Reject</button></div></div>`).join(''):`<div class="empty"><div class="empty-icon">✓</div><h3>No pending requests</h3><p>You're all caught up</p></div>`;}
+function handleRequest(id,action){var r=requests.find(x=>x.id===id);if(r){r.status=action;if(action==='approved'){var gid=groups.findIndex(g=>g.name===r.group);if(gid>=0)groups[gid].members++;}toast(action==='approved'?r.user+' approved':r.user+' rejected');}renderRequests();}
+function showCreateGroup(){var f=document.getElementById('createGroupForm');f.style.display=f.style.display==='none'?'block':'none';}
+function createGroup(){var name=document.getElementById('cg-name').value;if(!name){toast('Group name required');return;}var game=document.getElementById('cg-game').value;var region=document.getElementById('cg-region').value;var desc=document.getElementById('cg-desc').value;groups.push({id:groups.length+1,name,desc:desc||'A new group.',game,region,level:'Casual',members:1,organizer:'You'});document.getElementById('createGroupForm').style.display='none';document.getElementById('cg-name').value='';document.getElementById('cg-desc').value='';document.getElementById('org-groups-count').textContent=parseInt(document.getElementById('org-groups-count').textContent)+1;renderOrg();toast('Group created!','success');}
+function toast(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(type?' '+type:'');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+renderFeatured();
+</script>
+</body>
+</html>
