@@ -185,10 +185,3 @@ Netlify\
 Vercel
 
 Simply upload the demo files and enable static hosting.
-
-------------------------------------------------------------------------
-
-## Author
-
-Kashif Ilyas\
-Full Stack Engineer
